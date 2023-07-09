@@ -1,0 +1,38 @@
+{
+    "name": "adinan-cenci/descriptive-manager",
+    "description": "A library to manage descriptive playlists.", 
+    "type": "library", 
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adinan Cenci",
+            "email": "adinancenci@protonmail.com", 
+            "role": "developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/adinan-cenci/descriptive-playlist"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "adinan-cenci/descriptive-playlist": "^3.0"
+    }, 
+    "autoload": {
+        "psr-4": {
+            "AdinanCenci\\DescriptiveManager\\": "src/",
+            "AdinanCenci\\DescriptiveManager\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "unit-tests": [
+            "mkdir -p tests/files",
+            "./vendor/bin/phpunit tests"
+        ]
+    }
+}
