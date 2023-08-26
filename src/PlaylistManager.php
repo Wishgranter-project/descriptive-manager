@@ -101,12 +101,22 @@ class PlaylistManager
 
     public function setItem(string $playlistId, PlaylistItem $item, ?int $position = null) 
     {
+        if (! $item->isValid($errors)) {
+            throw new \InvalidArgumentException(implode(', ', $errors));
+            return false;
+        }
+
         $set = new Set($this, $playlistId, $item, $position);
         $set->commit();
     }
 
     public function addItem(string $playlistId, PlaylistItem $item, ?int $position = null) 
     {
+        if (! $item->isValid($errors)) {
+            throw new \InvalidArgumentException(implode(', ', $errors));
+            return false;
+        }
+
         $set = new Add($this, $playlistId, $item, $position);
         $set->commit();
     }
