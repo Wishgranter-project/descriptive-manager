@@ -7,11 +7,18 @@ class Search
 {
     protected PlaylistManager $manager;
     protected ConditionGroup $mainGroup;
+    protected array $playlistIds = [];
 
     public function __construct(PlaylistManager $manager, $operator = 'AND') 
     {
         $this->manager = $manager;
         $this->mainGroup = new ConditionGroup($operator);
+    }
+
+    public function playlists($playlistIds) 
+    {
+        $this->playlistIds = (array) $playlistIds;
+        return $this;
     }
 
     public function condition($property, $valueToCompare, string $operatorId = '=') 
@@ -34,6 +41,10 @@ class Search
     {
         $results = [];
         foreach ($this->manager->getAllPlaylists() as $playlistId => $playlist) {
+            if ($this->playlistIds && !in_array($playlistId, $this->playlistIds)) {
+                continue;
+            }
+
             $search = $this->newSearchObject($playlist);
             if ($finds = $search->find()) {
                 $results[$playlistId] = $finds;
