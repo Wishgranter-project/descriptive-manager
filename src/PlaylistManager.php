@@ -135,6 +135,20 @@ class PlaylistManager
         return null;
     }
 
+    public function findItemByUuid(string $uuid, &$playlistId = null) : ?PlaylistItem 
+    {
+        $playlistId = null;
+        foreach ($this->getAllPlaylists() as $pId => $playlist) {
+            $item = $playlist->getItemByUuid($uuid);
+            if ($item) {
+                $playlistId = $pId;
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
     public function search(string $operator = 'AND') : Search
     {
         return new Search($this, $operator);
