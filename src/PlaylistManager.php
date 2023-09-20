@@ -99,7 +99,7 @@ class PlaylistManager
             : null;
     }
 
-    public function setItem(string $playlistId, PlaylistItem $item, ?int $position = null) 
+    public function setItem(string $playlistId, PlaylistItem $item, ?int $position = null) : PlaylistItem
     {
         if (! $item->isValid($errors)) {
             throw new \InvalidArgumentException(implode(', ', $errors));
@@ -107,10 +107,10 @@ class PlaylistManager
         }
 
         $set = new Set($this, $playlistId, $item, $position);
-        $set->commit();
+        return $set->commit();
     }
 
-    public function addItem(string $playlistId, PlaylistItem $item, ?int $position = null) 
+    public function addItem(string $playlistId, PlaylistItem $item, ?int $position = null) : PlaylistItem
     {
         if (! $item->isValid($errors)) {
             throw new \InvalidArgumentException(implode(', ', $errors));
@@ -118,7 +118,7 @@ class PlaylistManager
         }
 
         $set = new Add($this, $playlistId, $item, $position);
-        $set->commit();
+        return $set->commit();
     }
 
     public function getItemByUuid(string $uuid, ?string $playlistId = null) : ?PlaylistItem 

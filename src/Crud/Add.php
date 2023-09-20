@@ -9,14 +9,14 @@ use AdinanCenci\DescriptivePlaylist\PlaylistItem;
  */
 class Add extends Set 
 {
-    public function commit() : void
+    public function commit() : PlaylistItem
     {
         $results = $this->getAllAssociatedItems();
         if (empty($results)) {
             // There is nothing associated, it is a new item, just add and be done.
             $playlist = $this->manager->getPlaylist($this->intendedPlaylistId);
             $playlist->setItem($this->item, $this->position);
-            return;
+            return $this->item;
         }
 
         foreach ($results as $playlistId => $items) {
@@ -32,5 +32,6 @@ class Add extends Set
         $copy->xxxOriginal = $this->item->xxxOriginal ?? $this->item->uuid;
 
         $this->manager->getPlaylist($this->intendedPlaylistId)->setItem($copy, $this->position);
+        return $copy;
     }
 }

@@ -25,14 +25,14 @@ class Set
         $this->position           = $position;
     }
 
-    public function commit() : void
+    public function commit() : PlaylistItem
     {
         $results = $this->getAllAssociatedItems();
         if (empty($results)) {
             // There is nothing associated, it is a new item, just add and be done.
             $playlist = $this->manager->getPlaylist($this->intendedPlaylistId);
             $playlist->setItem($this->item, $this->position);
-            return;
+            return $this->item;
         }
 
         foreach ($results as $playlistId => $items) {
@@ -48,6 +48,8 @@ class Set
 
             $playlist->setItem($item, $position);
         }
+
+        return $this->item;
     }
 
     protected function getAllAssociatedItems() : array
