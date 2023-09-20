@@ -4,29 +4,31 @@ namespace AdinanCenci\DescriptiveManager\Crud;
 use AdinanCenci\DescriptiveManager\PlaylistManager;
 use AdinanCenci\DescriptivePlaylist\PlaylistItem;
 
+/**
+ * This will create a copy of the item, unlike Set.
+ */
 class Add extends Set 
 {
     public function commit() : void
     {
         $results = $this->getAllAssociatedItems();
         if (empty($results)) {
-            // Simply add ...
+            // There is nothing associated, it is a new item, just add and be done.
             $playlist = $this->manager->getPlaylist($this->intendedPlaylistId);
             $playlist->setItem($this->item, $this->position);
             return;
         }
 
         foreach ($results as $playlistId => $items) {
-            foreach ($items as $position => $item) {
-                $this->copy($item, $this->item);
+            foreach ($items as $pos => $item) {
+                $this->copyProperties($item, $this->item);
             }
 
             $playlist = $this->manager->getPlaylist($playlistId);
-            $playlist->setItem($item, $position);
+            $playlist->setItem($item, $pos);
         }
 
-        $copy = new PlaylistItem();
-        $this->copy($copy, $this->item);
+        $copy = $this->item->createCopy();
         $copy->xxxOriginal = $this->item->xxxOriginal ?? $this->item->uuid;
 
         $this->manager->getPlaylist($this->intendedPlaylistId)->setItem($copy, $this->position);

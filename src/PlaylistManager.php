@@ -17,7 +17,7 @@ class PlaylistManager
         $this->directory = rtrim($directory, '/') . '/';
     }
 
-    public function createPlaylist(string $title, ?string $description = null, ?string $name = null, &$id) : Playlist
+    public function createPlaylist(string $title, ?string $description = null, ?string $name = null, &$id = null) : Playlist
     {
         $filename = $name
             ? $this->getAvailableFilename($name)
@@ -202,7 +202,7 @@ class PlaylistManager
                 $n = (preg_match('/-([\d]+)$/', $filename, $matches) ? $matches[1] : 1) + 1;
                 $filename = preg_replace('/-[\d]+$/', '', $filename) . '-' . $n;
                 $basename = $filename . '.dpls';
-                $absolutePath = $this->directory . $basename;                
+                $absolutePath = $this->directory . $basename;
             } while(file_exists($absolutePath));
         }
 

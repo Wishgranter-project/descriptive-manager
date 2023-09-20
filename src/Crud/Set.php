@@ -4,6 +4,9 @@ namespace AdinanCenci\DescriptiveManager\Crud;
 use AdinanCenci\DescriptiveManager\PlaylistManager;
 use AdinanCenci\DescriptivePlaylist\PlaylistItem;
 
+/**
+ * This will NOT create a copy of the item, unlike Add.
+ */
 class Set 
 {
     protected PlaylistManager $manager;
@@ -26,18 +29,24 @@ class Set
     {
         $results = $this->getAllAssociatedItems();
         if (empty($results)) {
-            // Simply add ...
+            // There is nothing associated, it is a new item, just add and be done.
             $playlist = $this->manager->getPlaylist($this->intendedPlaylistId);
             $playlist->setItem($this->item, $this->position);
+            return;
         }
 
         foreach ($results as $playlistId => $items) {
-            foreach ($items as $position => $item) {
-                $this->copy($item, $this->item);
+            foreach ($items as $pos => $item) {
+                $this->copyProperties($item, $this->item);
             }
 
             $playlist = $this->manager->getPlaylist($playlistId);
-            $playlist->setItem($item, $item->uuid == $this->item->uuid ? $this->position : $position);
+
+            $position = $item->uuid == $this->item->uuid
+                ? $this->position // It is the ver subject of this operation.
+                : $pos; // a different item.
+
+            $playlist->setItem($item, $position);
         }
     }
 
@@ -47,8 +56,10 @@ class Set
         return $this->manager->getAllAssociatedItems($baseUuid);
     }
 
-    protected function copy(PlaylistItem $into, PlaylistItem $from) : void
+    protected function copyProperties(PlaylistItem $into, PlaylistItem $from) : void
     {
+        $into->empty(['uuid', 'xxxOriginal']);
+
         $properties = array_filter($from->getSetPropertiesNames(), function($prp) 
         {
             return !in_array($prp, ['uuid']);
