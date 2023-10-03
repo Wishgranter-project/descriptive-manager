@@ -168,7 +168,7 @@ class PlaylistManager
     /**
      * Returns an available filename based of a random string.
      */
-    protected function getUniqueFilename() : string
+    public function getUniqueFilename() : string
     {
         do {
             $filename = Helpers::guidv4();
@@ -179,16 +179,23 @@ class PlaylistManager
         return $filename;
     }
 
+    public function sanitizeFilename(string $baseName) : string 
+    {
+        $filename = strtolower($baseName);
+        $filename = str_replace('_', '-', $filename);
+        $filename = preg_replace('/ +/', '-', $filename);
+        $filename = preg_replace('/[^\w\-]/', '', $filename);
+
+        return $filename;
+    }
+
     /**
      * Returns an available filename based of $base
      * with sanitization ofcourse.
      */
-    protected function getAvailableFilename(string $base) : string
+    public function getAvailableFilename(string $base) : string
     {
-        $filename = strtolower($base);
-        $filename = str_replace('_', '-', $filename);
-        $filename = preg_replace('/ +/', '-', $filename);
-        $filename = preg_replace('/[^\w\-]/', '', $filename);
+        $filename = $this->sanitizeFilename($base);
 
         if (empty($base)) {
             throw new \InvalidArgumentException('Invalid file name');
