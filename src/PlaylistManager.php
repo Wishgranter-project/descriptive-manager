@@ -4,6 +4,7 @@ namespace AdinanCenci\DescriptiveManager;
 use AdinanCenci\DescriptiveManager\Search\Search;
 use AdinanCenci\DescriptiveManager\Crud\Set;
 use AdinanCenci\DescriptiveManager\Crud\Add;
+use AdinanCenci\DescriptiveManager\Crud\Move;
 use AdinanCenci\DescriptivePlaylist\Playlist;
 use AdinanCenci\DescriptivePlaylist\PlaylistItem;
 use AdinanCenci\DescriptivePlaylist\Utils\Helpers;
@@ -119,6 +120,12 @@ class PlaylistManager
 
         $set = new Add($this, $playlistId, $item, $position);
         return $set->commit();
+    }
+
+    public function moveItem(string $toPlaylistId, PlaylistItem $item, ?int $position = null) : bool
+    {
+        $move = new Move($this, $toPlaylistId, $item, $position);
+        return $move->commit();
     }
 
     public function getItemByUuid(string $uuid, ?string $playlistId = null) : ?PlaylistItem 
