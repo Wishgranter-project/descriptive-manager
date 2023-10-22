@@ -179,11 +179,20 @@ class PlaylistManager
         return $filename;
     }
 
+    /**
+     * Receives an ordinary string and sanitizes and normalizes it
+     * to be used as a filename.
+     *
+     * @param string $baseName
+     *
+     * @return string
+     */
     public function sanitizeFilename(string $baseName) : string 
     {
         $filename = strtolower($baseName);
         $filename = str_replace('_', '-', $filename);
         $filename = preg_replace('/ +/', '-', $filename);
+        $filename = preg_replace('/-{2,}/', '-', $filename);
         $filename = preg_replace('/[^\w\-]/', '', $filename);
 
         return $filename;
@@ -204,14 +213,16 @@ class PlaylistManager
         $basename = $filename . '.dpls';
         $absolutePath = $this->directory . $basename;
 
-        if (file_exists($absolutePath)) {
-            do {
-                $n = (preg_match('/-([\d]+)$/', $filename, $matches) ? $matches[1] : 1) + 1;
-                $filename = preg_replace('/-[\d]+$/', '', $filename) . '-' . $n;
-                $basename = $filename . '.dpls';
-                $absolutePath = $this->directory . $basename;
-            } while(file_exists($absolutePath));
+        if (!file_exists($absolutePath)) {
+            return $filename;
         }
+
+        do {
+            $n = (preg_match('/-([\d]+)$/', $filename, $matches) ? $matches[1] : 1) + 1;
+            $filename = preg_replace('/-[\d]+$/', '', $filename) . '-' . $n;
+            $basename = $filename . '.dpls';
+            $absolutePath = $this->directory . $basename;
+        } while(file_exists($absolutePath));
 
         return $filename;
     }
