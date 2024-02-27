@@ -1,12 +1,13 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Tests;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
-use AdinanCenci\DescriptivePlaylist\PlaylistItem;
+namespace WishgranterProject\DescriptiveManager\Tests;
+
+use WishgranterProject\DescriptiveManager\PlaylistManager;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
 class CreatePlaylistTest extends Base
 {
-    public function testCreateNewPlaylistFilenameBasedOffAString() 
+    public function testCreateNewPlaylistFilenameBasedOffAString()
     {
         $directory = $this->resetTest(__FUNCTION__);
         $manager = new PlaylistManager($directory);
@@ -17,7 +18,7 @@ class CreatePlaylistTest extends Base
         $this->assertEquals('foo-bar.dpls', $basename);
     }
 
-    public function testCreateNewPlaylistFilenameBasedOffAStringTwice() 
+    public function testCreateNewPlaylistFilenameBasedOffAStringTwice()
     {
         $directory = $this->resetTest(__FUNCTION__);
         $manager = new PlaylistManager($directory);
@@ -32,7 +33,7 @@ class CreatePlaylistTest extends Base
         $this->assertEquals('foo-bar-2.dpls', $basename2);
     }
 
-    public function testCreateNewPlaylistWithRandomFilename() 
+    public function testCreateNewPlaylistWithRandomFilename()
     {
         $directory = $this->resetTest(__FUNCTION__);
         $manager = new PlaylistManager($directory);
@@ -43,5 +44,4 @@ class CreatePlaylistTest extends Base
 
         $this->assertEquals(41, $strlen);
     }
-
 }

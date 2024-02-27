@@ -1,5 +1,6 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Tests;
+<?php
+
+namespace WishgranterProject\DescriptiveManager\Tests;
 
 use PHPUnit\Framework\TestCase;
 
@@ -39,5 +40,4 @@ abstract class Base extends TestCase
         copy('./tests/template-metal.dpls', $directory . 'template-metal.dpls');
         copy('./tests/template-uplifting-metal-songs.dpls', $directory . 'template-uplifting-metal-songs.dpls');
     }
-
 }

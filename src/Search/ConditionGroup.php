@@ -1,7 +1,8 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Search;
+<?php
 
-class ConditionGroup 
+namespace WishgranterProject\DescriptiveManager\Search;
+
+class ConditionGroup
 {
     protected string $operator;
 
@@ -9,19 +10,19 @@ class ConditionGroup
 
     protected array $groups = [];
 
-    public function __construct($operator = 'AND') 
+    public function __construct($operator = 'AND')
     {
         $this->operator = $operator;
     }
 
-    public function __get($var) 
+    public function __get($var)
     {
         if (isset($this->{$var})) {
             return $this->{$var};
         }
     }
 
-    public function condition($property, $valueToCompare, string $operatorId = '=') 
+    public function condition($property, $valueToCompare, string $operatorId = '=')
     {
         $this->conditions[] = [
             'property'       => $property,
@@ -32,18 +33,17 @@ class ConditionGroup
         return $this;
     }
 
-    public function andConditionGroup() 
+    public function andConditionGroup()
     {
         $group = new ConditionGroup('AND');
         $this->groups[] = $group;
         return $group;
     }
 
-    public function orConditionGroup() 
+    public function orConditionGroup()
     {
         $group = new ConditionGroup('OR');
         $this->groups[] = $group;
         return $group;
     }
-
 }

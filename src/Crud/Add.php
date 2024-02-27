@@ -1,15 +1,16 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Crud;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
-use AdinanCenci\DescriptivePlaylist\PlaylistItem;
+namespace WishgranterProject\DescriptiveManager\Crud;
+
+use WishgranterProject\DescriptiveManager\PlaylistManager;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
 /**
  * This will create a copy of the item, unlike Set.
  */
-class Add extends Set 
+class Add extends Set
 {
-    public function commit() : PlaylistItem
+    public function commit(): PlaylistItem
     {
         $results = $this->getAllAssociatedItems();
         if (empty($results)) {

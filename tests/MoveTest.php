@@ -1,12 +1,13 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Tests;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
-use AdinanCenci\DescriptivePlaylist\PlaylistItem;
+namespace WishgranterProject\DescriptiveManager\Tests;
+
+use WishgranterProject\DescriptiveManager\PlaylistManager;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
 class MoveTest extends Base
 {
-    public function testMoveItem() 
+    public function testMoveItem()
     {
         $directory = $this->resetTest(__FUNCTION__);
         $manager = new PlaylistManager($directory);

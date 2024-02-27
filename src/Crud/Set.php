@@ -1,13 +1,14 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Crud;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
-use AdinanCenci\DescriptivePlaylist\PlaylistItem;
+namespace WishgranterProject\DescriptiveManager\Crud;
+
+use WishgranterProject\DescriptiveManager\PlaylistManager;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
 /**
  * This will NOT create a copy of the item, unlike Add.
  */
-class Set 
+class Set
 {
     protected PlaylistManager $manager;
 
@@ -17,15 +18,19 @@ class Set
 
     protected ?int $position = null;
 
-    public function __construct(PlaylistManager $manager, string $intendedPlaylistId, PlaylistItem $item, ?int $position = null) 
-    {
+    public function __construct(
+        PlaylistManager $manager,
+        string $intendedPlaylistId,
+        PlaylistItem $item,
+        ?int $position = null
+    ) {
         $this->manager            = $manager;
         $this->intendedPlaylistId = $intendedPlaylistId;
         $this->item               = $item;
         $this->position           = $position;
     }
 
-    public function commit() : PlaylistItem
+    public function commit(): PlaylistItem
     {
         $results = $this->getAllAssociatedItems();
         if (empty($results)) {
@@ -52,18 +57,17 @@ class Set
         return $this->item;
     }
 
-    protected function getAllAssociatedItems() : array
+    protected function getAllAssociatedItems(): array
     {
         $baseUuid = $this->item->xxxOriginal ?? $this->item->uuid;
         return $this->manager->getAllAssociatedItems($baseUuid);
     }
 
-    protected function copyProperties(PlaylistItem $into, PlaylistItem $from) : void
+    protected function copyProperties(PlaylistItem $into, PlaylistItem $from): void
     {
         $into->empty(['uuid', 'xxxOriginal']);
 
-        $properties = array_filter($from->getSetPropertiesNames(), function($prp) 
-        {
+        $properties = array_filter($from->getSetPropertiesNames(), function ($prp) {
             return !in_array($prp, ['uuid']);
         });
 

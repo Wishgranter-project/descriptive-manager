@@ -1,25 +1,30 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager;
+<?php
 
-use AdinanCenci\DescriptiveManager\Search\Search;
-use AdinanCenci\DescriptiveManager\Crud\Set;
-use AdinanCenci\DescriptiveManager\Crud\Add;
-use AdinanCenci\DescriptiveManager\Crud\Move;
-use AdinanCenci\DescriptivePlaylist\Playlist;
-use AdinanCenci\DescriptivePlaylist\PlaylistItem;
-use AdinanCenci\DescriptivePlaylist\Utils\Helpers;
+namespace WishgranterProject\DescriptiveManager;
 
-class PlaylistManager 
+use WishgranterProject\DescriptiveManager\Search\Search;
+use WishgranterProject\DescriptiveManager\Crud\Set;
+use WishgranterProject\DescriptiveManager\Crud\Add;
+use WishgranterProject\DescriptiveManager\Crud\Move;
+use WishgranterProject\DescriptivePlaylist\Playlist;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
+use WishgranterProject\DescriptivePlaylist\Utils\Helpers;
+
+class PlaylistManager
 {
     protected string $directory;
 
-    public function __construct(string $directory) 
+    public function __construct(string $directory)
     {
         $this->directory = rtrim($directory, '/') . '/';
     }
 
-    public function createPlaylist(string $title, ?string $description = null, ?string $name = null, &$id = null) : Playlist
-    {
+    public function createPlaylist(
+        string $title,
+        ?string $description = null,
+        ?string $name = null,
+        &$id = null
+    ): Playlist {
         $filename = $name
             ? $this->getAvailableFilename($name)
             : $this->getUniqueFilename();
@@ -37,23 +42,23 @@ class PlaylistManager
         return $playlist;
     }
 
-    public function playlistExists(string $playlistId) : bool
+    public function playlistExists(string $playlistId): bool
     {
         $basename = $playlistId . '.dpls';
         $absolutePath = $this->directory . $basename;
         return file_exists($absolutePath);
     }
 
-    public function getPlaylist(string $playlistId) : ?Playlist
+    public function getPlaylist(string $playlistId): ?Playlist
     {
         $files = $this->getAllPlaylistFiles();
 
-        return isset($files[$playlistId]) 
+        return isset($files[$playlistId])
             ? new Playlist($files[$playlistId])
             : null;
     }
 
-    public function deletePlaylist(string $playlistId) 
+    public function deletePlaylist(string $playlistId)
     {
         $basename = $playlistId . '.dpls';
         $absolutePath = $this->directory . $basename;
@@ -66,7 +71,7 @@ class PlaylistManager
     /**
      * @return string[]
      */
-    public function getAllPlaylistFiles() : array
+    public function getAllPlaylistFiles(): array
     {
         $entries = scandir($this->directory);
         $playlists = [];
@@ -80,19 +85,18 @@ class PlaylistManager
         return $playlists;
     }
 
-    public function getAllPlaylists() : array
+    public function getAllPlaylists(): array
     {
         $files = $this->getAllPlaylistFiles();
 
-        array_walk($files, function(&$item, $key)
-        {
+        array_walk($files, function (&$item, $key) {
             $item = new Playlist($item);
         });
 
         return $files;
     }
 
-    public function getItem(string $playlistId, int $position) : ?PlaylistItem
+    public function getItem(string $playlistId, int $position): ?PlaylistItem
     {
         $playlist = $this->getPlaylist($playlistId);
         return $playlist
@@ -100,7 +104,7 @@ class PlaylistManager
             : null;
     }
 
-    public function setItem(string $playlistId, PlaylistItem $item, ?int $position = null) : PlaylistItem
+    public function setItem(string $playlistId, PlaylistItem $item, ?int $position = null): PlaylistItem
     {
         if (! $item->isValid($errors)) {
             throw new \InvalidArgumentException(implode(', ', $errors));
@@ -111,7 +115,7 @@ class PlaylistManager
         return $set->commit();
     }
 
-    public function addItem(string $playlistId, PlaylistItem $item, ?int $position = null) : PlaylistItem
+    public function addItem(string $playlistId, PlaylistItem $item, ?int $position = null): PlaylistItem
     {
         if (! $item->isValid($errors)) {
             throw new \InvalidArgumentException(implode(', ', $errors));
@@ -122,13 +126,13 @@ class PlaylistManager
         return $set->commit();
     }
 
-    public function moveItem(string $toPlaylistId, PlaylistItem $item, ?int $position = null) : bool
+    public function moveItem(string $toPlaylistId, PlaylistItem $item, ?int $position = null): bool
     {
         $move = new Move($this, $toPlaylistId, $item, $position);
         return $move->commit();
     }
 
-    public function getItemByUuid(string $uuid, ?string $playlistId = null) : ?PlaylistItem 
+    public function getItemByUuid(string $uuid, ?string $playlistId = null): ?PlaylistItem
     {
         foreach ($this->getAllPlaylists() as $pId => $playlist) {
             if (($playlistId && $playlistId == $pId) || !$playlistId) {
@@ -142,7 +146,7 @@ class PlaylistManager
         return null;
     }
 
-    public function findItemByUuid(string $uuid, &$playlistId = null) : ?PlaylistItem 
+    public function findItemByUuid(string $uuid, &$playlistId = null): ?PlaylistItem
     {
         $playlistId = null;
         foreach ($this->getAllPlaylists() as $pId => $playlist) {
@@ -156,12 +160,12 @@ class PlaylistManager
         return null;
     }
 
-    public function search(string $operator = 'AND') : Search
+    public function search(string $operator = 'AND'): Search
     {
         return new Search($this, $operator);
     }
 
-    public function getAllAssociatedItems(string $baseUuid) : array
+    public function getAllAssociatedItems(string $baseUuid): array
     {
         $search = $this->search('OR');
 
@@ -175,13 +179,13 @@ class PlaylistManager
     /**
      * Returns an available filename based of a random string.
      */
-    public function getUniqueFilename() : string
+    public function getUniqueFilename(): string
     {
         do {
             $filename = Helpers::guidv4();
             $basename = $filename . '.dpls';
             $absolutePath = $this->directory . $basename;
-        } while(file_exists($absolutePath));
+        } while (file_exists($absolutePath));
 
         return $filename;
     }
@@ -194,7 +198,7 @@ class PlaylistManager
      *
      * @return string
      */
-    public function sanitizeFilename(string $baseName) : string 
+    public function sanitizeFilename(string $baseName): string
     {
         $filename = strtolower($baseName);
         $filename = str_replace('_', '-', $filename);
@@ -209,7 +213,7 @@ class PlaylistManager
      * Returns an available filename based of $base
      * with sanitization ofcourse.
      */
-    public function getAvailableFilename(string $base) : string
+    public function getAvailableFilename(string $base): string
     {
         $filename = $this->sanitizeFilename($base);
 
@@ -229,7 +233,7 @@ class PlaylistManager
             $filename = preg_replace('/-[\d]+$/', '', $filename) . '-' . $n;
             $basename = $filename . '.dpls';
             $absolutePath = $this->directory . $basename;
-        } while(file_exists($absolutePath));
+        } while (file_exists($absolutePath));
 
         return $filename;
     }

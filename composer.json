@@ -1,5 +1,5 @@
 {
-    "name": "adinan-cenci/descriptive-manager",
+    "name": "wishgranter-project/descriptive-manager",
     "description": "A library to manage descriptive playlists.", 
     "type": "library", 
     "license": "MIT",
@@ -13,17 +13,17 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/adinan-cenci/descriptive-playlist"
+            "url": "https://github.com/wishgranter-project/descriptive-playlist"
         }
     ],
     "require": {
         "php": ">=7.0",
-        "adinan-cenci/descriptive-playlist": "^4.0"
+        "wishgranter-project/descriptive-playlist": "^5.0"
     }, 
     "autoload": {
         "psr-4": {
-            "AdinanCenci\\DescriptiveManager\\": "src/",
-            "AdinanCenci\\DescriptiveManager\\Tests\\": "tests/"
+            "WishgranterProject\\DescriptiveManager\\": "src/",
+            "WishgranterProject\\DescriptiveManager\\Tests\\": "tests/"
         }
     },
     "require-dev": {

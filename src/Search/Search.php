@@ -1,43 +1,44 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Search;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
+namespace WishgranterProject\DescriptiveManager\Search;
 
-class Search 
+use WishgranterProject\DescriptiveManager\PlaylistManager;
+
+class Search
 {
     protected PlaylistManager $manager;
     protected ConditionGroup $mainGroup;
     protected array $playlistIds = [];
 
-    public function __construct(PlaylistManager $manager, $operator = 'AND') 
+    public function __construct(PlaylistManager $manager, $operator = 'AND')
     {
         $this->manager = $manager;
         $this->mainGroup = new ConditionGroup($operator);
     }
 
-    public function playlists($playlistIds) 
+    public function playlists($playlistIds)
     {
         $this->playlistIds = (array) $playlistIds;
         return $this;
     }
 
-    public function condition($property, $valueToCompare, string $operatorId = '=') 
+    public function condition($property, $valueToCompare, string $operatorId = '=')
     {
         $this->mainGroup->condition($property, $valueToCompare, $operatorId);
         return $this;
     }
 
-    public function andConditionGroup() 
+    public function andConditionGroup()
     {
         return $this->mainGroup->andConditionGroup();
     }
 
-    public function orConditionGroup() 
+    public function orConditionGroup()
     {
         return $this->mainGroup->orConditionGroup();
     }
 
-    public function find(bool $removeDuplicated = true) : array
+    public function find(bool $removeDuplicated = true): array
     {
         $results = [];
         foreach ($this->manager->getAllPlaylists() as $playlistId => $playlist) {
@@ -56,21 +57,21 @@ class Search
             : $results;
     }
 
-    protected function newSearchObject($playlist) 
+    protected function newSearchObject($playlist)
     {
         $playlistSearch = $playlist->search($this->mainGroup->operator);
         $this->fromGroupToGroup($this->mainGroup, $playlistSearch);
         return $playlistSearch;
     }
 
-    protected function fromGroupToGroup($ours, $theirs) 
+    protected function fromGroupToGroup($ours, $theirs)
     {
         foreach ($ours->conditions as $con) {
             $theirs->condition($con['property'], $con['valueToCompare'], $con['operatorId']);
         }
 
         foreach ($ours->groups as $group) {
-            $g = $group->operator == 'AND' 
+            $g = $group->operator == 'AND'
                 ? $theirs->andConditionGroup()
                 : $theirs->orConditionGroup();
 
@@ -78,14 +79,14 @@ class Search
         }
     }
 
-    protected function removeDuplicatedResults(array $results) 
+    protected function removeDuplicatedResults(array $results)
     {
         $uuids = [];
 
         foreach ($results as $playlistId => $items) {
             foreach ($items as $position => $item) {
                 $uuid = $item->xxxOriginal ?? $item->uuid;
-                
+
                 if (! in_array($uuid, $uuids)) {
                     $uuids[] = $uuid;
                     continue;

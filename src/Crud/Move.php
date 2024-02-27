@@ -1,10 +1,11 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Crud;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
-use AdinanCenci\DescriptivePlaylist\PlaylistItem;
+namespace WishgranterProject\DescriptiveManager\Crud;
 
-class Move 
+use WishgranterProject\DescriptiveManager\PlaylistManager;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
+
+class Move
 {
     protected PlaylistManager $manager;
 
@@ -14,15 +15,19 @@ class Move
 
     protected ?int $position = null;
 
-    public function __construct(PlaylistManager $manager, string $intendedPlaylistId, PlaylistItem $item, ?int $position = null) 
-    {
+    public function __construct(
+        PlaylistManager $manager,
+        string $intendedPlaylistId,
+        PlaylistItem $item,
+        ?int $position = null
+    ) {
         $this->manager            = $manager;
         $this->intendedPlaylistId = $intendedPlaylistId;
         $this->item               = $item;
         $this->position           = $position;
     }
 
-    public function commit() : bool
+    public function commit(): bool
     {
         $item = $this->manager->findItemByUuid($this->item->uuid, $originalPlaylistId);
 

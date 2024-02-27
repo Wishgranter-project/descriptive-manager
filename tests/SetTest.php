@@ -1,11 +1,12 @@
-<?php 
-namespace AdinanCenci\DescriptiveManager\Tests;
+<?php
 
-use AdinanCenci\DescriptiveManager\PlaylistManager;
+namespace WishgranterProject\DescriptiveManager\Tests;
+
+use WishgranterProject\DescriptiveManager\PlaylistManager;
 
 class SetTest extends Base
 {
-    public function testUpdateItem() 
+    public function testUpdateItem()
     {
         $directory = $this->resetTest(__FUNCTION__);
         $manager = new PlaylistManager($directory);
@@ -19,7 +20,7 @@ class SetTest extends Base
         $this->assertEquals('Stolen Waters ( updated )', $item2->title);
     }
 
-    public function testUpdateOriginalItemAndRelatedItems() 
+    public function testUpdateOriginalItemAndRelatedItems()
     {
         $directory = $this->resetTest(__FUNCTION__);
         $manager = new PlaylistManager($directory);
