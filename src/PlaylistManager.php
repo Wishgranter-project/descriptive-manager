@@ -146,12 +146,13 @@ class PlaylistManager
         return null;
     }
 
-    public function findItemByUuid(string $uuid, &$playlistId = null): ?PlaylistItem
+    public function findItemByUuid(string $uuid, &$playlistId = null, &$position = null): ?PlaylistItem
     {
         $playlistId = null;
         foreach ($this->getAllPlaylists() as $pId => $playlist) {
-            $item = $playlist->getItemByUuid($uuid);
+            $item = $playlist->getItemByUuid($uuid, $pos);
             if ($item) {
+                $position = $pos;
                 $playlistId = $pId;
                 return $item;
             }
