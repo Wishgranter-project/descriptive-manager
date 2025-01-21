@@ -5,29 +5,12 @@ namespace WishgranterProject\DescriptiveManager\Crud;
 use WishgranterProject\DescriptiveManager\PlaylistManager;
 use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
-class Move
+class Move extends Set
 {
-    protected PlaylistManager $manager;
-
-    protected string $intendedPlaylistId;
-
-    protected PlaylistItem $item;
-
-    protected ?int $position = null;
-
-    public function __construct(
-        PlaylistManager $manager,
-        string $intendedPlaylistId,
-        PlaylistItem $item,
-        ?int $position = null
-    ) {
-        $this->manager            = $manager;
-        $this->intendedPlaylistId = $intendedPlaylistId;
-        $this->item               = $item;
-        $this->position           = $position;
-    }
-
-    public function commit(): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function commit(): PlaylistItem
     {
         $item = $this->manager->findItemByUuid($this->item->uuid, $originalPlaylistId);
 
@@ -48,6 +31,6 @@ class Move
 
         $newPlaylist->setItem($item, $this->position);
 
-        return true;
+        return $this->item;
     }
 }

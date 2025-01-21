@@ -10,6 +10,9 @@ use WishgranterProject\DescriptivePlaylist\PlaylistItem;
  */
 class Add extends Set
 {
+    /**
+     * {@inheritdoc}
+     */
     public function commit(): PlaylistItem
     {
         $results = $this->getAllAssociatedItems();
