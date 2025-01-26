@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": ">=7.0",
-        "wishgranter-project/descriptive-playlist": "^5.0"
+        "wishgranter-project/descriptive-playlist": "^6.0"
     }, 
     "autoload": {
         "psr-4": {

@@ -74,10 +74,9 @@ class Set
             return $this->item;
         }
 
-        foreach ($results as $playlistId => $items) {
-            foreach ($items as $pos => $item) {
-                $this->copyProperties($item, $this->item);
-            }
+        foreach ($results as $playlistIdPos => $item) {
+            list($playlistId, $pos) = preg_split('/-(?=\d+$)/', $playlistIdPos);
+            $this->copyProperties($item, $this->item);
 
             $playlist = $this->manager->getPlaylist($playlistId);
 

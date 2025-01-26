@@ -15,7 +15,7 @@ class SearchTest extends Base
         $search->condition('artist', 'Rhapsody of Fire');
 
         $results = $search->find();
-        $total = $this->countResults($results);
+        $total = count($results);
 
         $this->assertEquals(2, $total);
     }
@@ -26,17 +26,43 @@ class SearchTest extends Base
         $manager = new PlaylistManager($directory);
 
         $results = $manager->getAllAssociatedItems('c0299346-65e8-499a-bc1e-9b57ab053787');
-        $total = $this->countResults($results);
+        $total = count($results);
 
         $this->assertEquals(2, $total);
     }
 
-    protected function countResults($results): int
+    public function testOrderResults()
     {
-        $total = 0;
-        foreach ($results as $playlistId => $items) {
-            $total += count($items);
-        }
-        return $total;
+        $directory = $this->resetTest(__FUNCTION__);
+        $manager = new PlaylistManager($directory);
+
+        $search = $manager->search();
+        $search->orderBy('title', 'ASC');
+
+        $results = $search->find();
+
+        $first = reset($results);
+        $last = end($results);
+
+        $this->assertEquals('Cry of a restless soul', $first->title);
+        $this->assertEquals('Wisdom of the Kings', $last->title);
+    }
+
+    public function testOrderResultsRandomly()
+    {
+        $directory = $this->resetTest(__FUNCTION__);
+        $manager = new PlaylistManager($directory);
+
+        $search1 = $manager->search();
+        $search1->orderBy('RAND()');
+        $results1 = $search1->find();
+
+        $search2 = $manager->search();
+        $search2->orderBy('RAND()');
+        $results2 = $search2->find();
+
+        $equal = json_encode(array_keys($results1)) == json_encode(array_keys($results2));
+
+        $this->assertFalse($equal);
     }
 }

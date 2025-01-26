@@ -55,11 +55,14 @@ class PlaylistManager
         $absolutePath = $this->directory . $filename . '.dpls';
         $playlist = new Playlist($absolutePath);
 
-        $playlist->title = $title;
+        $header = $playlist->getHeader();
+        $header->title = $title;
+
         if ($description) {
-            $playlist->description = $description;
+            $header->description = $description;
         }
 
+        $playlist->setHeader($header);
         return $playlist;
     }
 
@@ -226,7 +229,7 @@ class PlaylistManager
     }
 
     /**
-     * Move a playlist item to a different playlist or just position.
+     * Move a playlist item to a different playlist.
      *
      * @param string $toPlaylist
      *   Playlist id.
@@ -246,6 +249,8 @@ class PlaylistManager
 
     /**
      * Retrieves a playlist item with a given uuid.
+     *
+     * If you need to move an item withing its playlist, use ::setItem().
      *
      * @param string $uuid
      *   The playlist item uuid.

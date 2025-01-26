@@ -2,6 +2,8 @@
 
 namespace WishgranterProject\DescriptiveManager\Search;
 
+use AdinanCenci\JsonLines\Search\Iterator\MetadataWrapper;
+use AdinanCenci\FileEditor\Search\Order;
 use WishgranterProject\DescriptiveManager\PlaylistManager;
 use WishgranterProject\DescriptivePlaylist\Search as PlaylistSearch;
 
@@ -26,6 +28,12 @@ class Search
     protected array $playlistIds = [];
 
     /**
+     * @var AdinanCenci\FileEditor\Search\Order;
+     *   Object to order the results.
+     */
+    protected Order $order;
+
+    /**
      * Constructor.
      *
      * @param WishgranterProject\DescriptiveManager\PlaylistManager $manager
@@ -37,6 +45,7 @@ class Search
     {
         $this->manager = $manager;
         $this->mainGroup = new ConditionGroup($operator);
+        $this->order = new Order();
     }
 
     /**
@@ -103,6 +112,21 @@ class Search
      */
     public function find(bool $removeDuplicated = true): array
     {
+        $results = $this->retrieveResults($removeDuplicated);
+        return $this->orderResults($results);
+    }
+
+    /**
+     * Retrieves the search results.
+     *
+     * @param bool $removeDuplicated
+     *   Removes duplicated playlist items.
+     *
+     * @return WishgranterProject\DescriptivePlaylist\PlaylistItem[]
+     *   Playlist items.
+     */
+    public function retrieveResults(bool $removeDuplicated = true): array
+    {
         $results = [];
         foreach ($this->manager->getAllPlaylists() as $playlistId => $playlist) {
             if ($this->playlistIds && !in_array($playlistId, $this->playlistIds)) {
@@ -110,14 +134,54 @@ class Search
             }
 
             $search = $this->newSearchObject($playlist);
-            if ($finds = $search->find()) {
-                $results[$playlistId] = $finds;
+            $finds = $search->find();
+            foreach ($finds as $position => $find) {
+                $results[$playlistId . '-' . $position] = $find;
             }
         }
 
         return $removeDuplicated
             ? $this->removeDuplicatedResults($results)
             : $results;
+    }
+
+    /**
+     * Adds a new criteria to order the results by.
+     *
+     * @param array|string $property
+     *   The property to order by.
+     * @param string $direction
+     *   Ascending or descending.
+     *
+     * @return WishgranterProject\DescriptiveManager\Search\Search
+     *   Returns itself.
+     */
+    public function orderBy(mixed $property, string $direction = 'ASC'): Search
+    {
+        $this->order->orderBy($property, $direction);
+        return $this;
+    }
+
+    /**
+     * @param WishgranterProject\DescriptivePlaylist\PlaylistItem[] $searchResults
+     *   Playlist items.
+     *
+     * @return WishgranterProject\DescriptivePlaylist\PlaylistItem[]
+     *   The items ordered.
+     */
+    protected function orderResults($searchResults)
+    {
+        $ordered = [];
+        foreach ($searchResults as $playlistPosition => $item) {
+            $ordered[$playlistPosition] = new MetadataWrapper(0, $item);
+        }
+
+        $this->order->order($ordered);
+        array_walk($ordered, function (&$item) {
+            $item = $item->data;
+        });
+
+        return $ordered;
     }
 
     /**
@@ -171,22 +235,15 @@ class Search
     protected function removeDuplicatedResults(array $results)
     {
         $uuids = [];
+        foreach ($results as $playlistIdPos => $item) {
+            $uuid = $item->xxxOriginal ?? $item->uuid;
 
-        foreach ($results as $playlistId => $items) {
-            foreach ($items as $position => $item) {
-                $uuid = $item->xxxOriginal ?? $item->uuid;
-
-                if (! in_array($uuid, $uuids)) {
-                    $uuids[] = $uuid;
-                    continue;
-                }
-
-                unset($results[ $playlistId ][ $position ]);
+            if (! in_array($uuid, $uuids)) {
+                $uuids[] = $uuid;
+                continue;
             }
 
-            if (empty($results[ $playlistId ])) {
-                unset($results[ $playlistId ]);
-            }
+            unset($results[ $playlistIdPos ]);
         }
 
         return $results;
