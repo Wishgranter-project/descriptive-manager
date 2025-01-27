@@ -54,15 +54,34 @@ class SearchTest extends Base
         $manager = new PlaylistManager($directory);
 
         $search1 = $manager->search();
-        $search1->orderBy('RAND()');
+        $search1->orderRandomly();
         $results1 = $search1->find();
 
         $search2 = $manager->search();
-        $search2->orderBy('RAND()');
+        $search2->orderRandomly();
         $results2 = $search2->find();
 
         $equal = json_encode(array_keys($results1)) == json_encode(array_keys($results2));
 
         $this->assertFalse($equal);
+    }
+
+    public function testOrderResultsRandomlyWithSeed()
+    {
+        $directory = $this->resetTest(__FUNCTION__);
+        $manager = new PlaylistManager($directory);
+        $seed = 'foo-bar' . rand(0, 1000);
+
+        $search1 = $manager->search();
+        $search1->orderRandomly($seed);
+        $results1 = $search1->find();
+
+        $search2 = $manager->search();
+        $search2->orderRandomly($seed);
+        $results2 = $search2->find();
+
+        $equal = json_encode(array_keys($results1)) == json_encode(array_keys($results2));
+
+        $this->assertTrue($equal);
     }
 }

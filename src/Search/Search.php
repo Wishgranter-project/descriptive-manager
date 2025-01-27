@@ -3,7 +3,7 @@
 namespace WishgranterProject\DescriptiveManager\Search;
 
 use AdinanCenci\JsonLines\Search\Iterator\MetadataWrapper;
-use AdinanCenci\FileEditor\Search\Order;
+use AdinanCenci\FileEditor\Search\Order\Order;
 use WishgranterProject\DescriptiveManager\PlaylistManager;
 use WishgranterProject\DescriptivePlaylist\Search as PlaylistSearch;
 
@@ -28,7 +28,7 @@ class Search
     protected array $playlistIds = [];
 
     /**
-     * @var AdinanCenci\FileEditor\Search\Order;
+     * @var AdinanCenci\FileEditor\Search\Order\Order;
      *   Object to order the results.
      */
     protected Order $order;
@@ -159,6 +159,22 @@ class Search
     public function orderBy(mixed $property, string $direction = 'ASC'): Search
     {
         $this->order->orderBy($property, $direction);
+        return $this;
+    }
+
+    /**
+     * Adds a new criteria to order the results randomly.
+     *
+     * @param null|string $seed
+     *   If informed, the seed will be used to order the results.
+     *   The items will be order the same every time.
+     *
+     * @return WishgranterProject\DescriptiveManager\Search\Search
+     *   Return itself.
+     */
+    public function orderRandomly(?string $seed = null): Search
+    {
+        $this->order->orderRandomly($seed);
         return $this;
     }
 
