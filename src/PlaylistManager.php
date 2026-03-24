@@ -19,6 +19,12 @@ class PlaylistManager
     protected string $directory;
 
     /**
+     * @var array
+     *   Array of resources.
+     */
+    protected array $locks;
+
+    /**
      * @param string $directory
      *   Absolute path to the playlist directory.
      */
@@ -412,5 +418,39 @@ class PlaylistManager
         } while (file_exists($absolutePath));
 
         return $filename;
+    }
+
+    /**
+     * Locks the collection against simultaneous editing.
+     *
+     * Common problem in race conditions due to concurrent requests.
+     *
+     * @return bool
+     *   True if the lock has been acquired.
+     */
+    public function lock(): bool
+    {
+        foreach ($this->getAllPlaylistFiles() as $basename => $filename) {
+            if (!isset($this->locks[$basename])) {
+                $this->locks[$basename] = fopen($filename, 'r');
+            }
+
+            if (!flock($this->locks[$basename], \LOCK_EX)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Unlocks the collection.
+     */
+    public function unlock(): void
+    {
+        foreach ($this->locks as $basename => $resource) {
+            fclose($resource);
+            unset($this->locks[$basename]);
+        }
     }
 }
