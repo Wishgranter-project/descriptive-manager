@@ -8,8 +8,7 @@ class SearchTest extends Base
 {
     public function testSearch()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $search = $manager->search();
         $search->condition('artist', 'Rhapsody of Fire');
@@ -22,8 +21,7 @@ class SearchTest extends Base
 
     public function testSearchAssociatedItems()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $results = $manager->getAllAssociatedItems('c0299346-65e8-499a-bc1e-9b57ab053787');
         $total = count($results);
@@ -33,8 +31,7 @@ class SearchTest extends Base
 
     public function testOrderResults()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $search = $manager->search();
         $search->orderBy('title', 'ASC');
@@ -50,8 +47,7 @@ class SearchTest extends Base
 
     public function testOrderResultsRandomly()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $search1 = $manager->search();
         $search1->orderRandomly();
@@ -68,8 +64,8 @@ class SearchTest extends Base
 
     public function testOrderResultsRandomlyWithSeed()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
+
         $seed = 'foo-bar' . rand(0, 1000);
 
         $search1 = $manager->search();

@@ -9,8 +9,7 @@ class CreatePlaylistTest extends Base
 {
     public function testCreateNewPlaylistFilenameBasedOffAString()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $playlist = $manager->createPlaylist('random', null, 'Foo Bar');
         $basename = basename($playlist->fileName);
@@ -20,8 +19,7 @@ class CreatePlaylistTest extends Base
 
     public function testCreateNewPlaylistFilenameBasedOffAStringTwice()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $playlist1 = $manager->createPlaylist('random', null, 'Foo Bar');
         $basename1 = basename($playlist1->fileName);
@@ -35,8 +33,7 @@ class CreatePlaylistTest extends Base
 
     public function testCreateNewPlaylistWithRandomFilename()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
         $playlist = $manager->createPlaylist('random');
         $basename = basename($playlist->fileName);
