@@ -7,17 +7,36 @@ use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
 class MoveTest extends Base
 {
-    public function testMoveItem()
+    public function testMoveItemFromOnePlaylistToAnother()
     {
-        $directory = $this->resetTest(__FUNCTION__);
-        $manager = new PlaylistManager($directory);
+        $manager = $this->getManager(__FUNCTION__);
 
-        $viperSong = $manager->findItemByUuid('c65f0dce-07f6-417a-9be7-0be65071adf8', $originalPlaylistId);
+        $targetSong = $manager->findItemByUuid('c65f0dce-07f6-417a-9be7-0be65071adf8', $originalPlaylistId);
 
-        $manager->moveItem('template-uplifting-metal-songs', $viperSong);
+        $manager->moveItem('uplifting-metal-songs', $targetSong);
 
-        $viperSongAfterMoved = $manager->findItemByUuid('c65f0dce-07f6-417a-9be7-0be65071adf8', $newPlaylistId);
+        //------------------
 
-        $this->assertEquals('template-uplifting-metal-songs', $newPlaylistId);
+        $targetSongAfterBeingMoved = $manager->findItemByUuid('c65f0dce-07f6-417a-9be7-0be65071adf8', $newPlaylistId);
+
+        $this->assertEquals('metal', $originalPlaylistId);
+        $this->assertEquals('uplifting-metal-songs', $newPlaylistId);
+    }
+
+    public function testMoveItemFromOnePlaylistToTheMiddleOfAnother()
+    {
+        $manager = $this->getManager(__FUNCTION__);
+
+        $targetSong = $manager->findItemByUuid('c65f0dce-07f6-417a-9be7-0be65071adf8', $originalPlaylistId);
+
+        $manager->moveItem('uplifting-metal-songs', $targetSong, 5);
+
+        //------------------
+
+        $targetSongAfterBeingMoved = $manager->findItemByUuid('c65f0dce-07f6-417a-9be7-0be65071adf8', $newPlaylistId, $position);
+
+        $this->assertEquals('metal', $originalPlaylistId);
+        $this->assertEquals('uplifting-metal-songs', $newPlaylistId);
+        $this->assertEquals(5, $position);
     }
 }

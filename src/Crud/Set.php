@@ -121,5 +121,9 @@ class Set
         foreach ($properties as $prp) {
             $into->{$prp} = $from->{$prp};
         }
+
+        if ($into->xxxOriginal == $into->uuid) {
+            unset($into->xxxOriginal);
+        }
     }
 }

@@ -3,41 +3,103 @@
 namespace WishgranterProject\DescriptiveManager\Tests;
 
 use PHPUnit\Framework\TestCase;
+use WishgranterProject\DescriptiveManager\PlaylistManager;
 
 abstract class Base extends TestCase
 {
-    protected function resetTest($directoryName) 
+    /**
+     * Resets a test.
+     *
+     * Delete files and make copies of templates so we may repeat a test.
+     *
+     * @param string $directoryName.
+     *   Basename of a directory.
+     *
+     * @return string
+     *   Relative path to the directory.
+     */
+    protected function resetTest(string $directoryName)
     {
         $directory = './tests/files/' . $directoryName . '/';
         $this->createDirectory($directory);
         $this->emptyDirectory($directory);
-        $this->copyFilesTo($directory);
+        $this->copyTemplateFilesTo($directory);
         return $directory;
     }
 
-    protected function createDirectory($directory) 
+    /**
+     * Creates a directory if it does not exist already.
+     *
+     * @param string $directory
+     *   Relative path for the directory.
+     */
+    protected function createDirectory(string $directory): void
     {
         if (!is_dir($directory)) {
             mkdir($directory, 0777, true);
         }
     }
 
-    protected function emptyDirectory($directory) 
+    /**
+     * Empties a directory of test related files.
+     *
+     * @param string $directory
+     *   Relative path to the directory.
+     */
+    protected function emptyDirectory(string $directory): void
     {
         $entries = scandir($directory);
 
-        foreach ($entries as $e) {
-            if (in_array($e, ['.', '..'])) {
+        foreach ($entries as $entry) {
+            if (in_array($entry, ['.', '..'])) {
                 continue;
             }
 
-            unlink($directory . '/' . $e);
+            if (substr($entry, -5) != '.dpls') {
+                continue;
+            }
+
+            unlink($directory . '/' . $entry);
         }
     }
 
-    protected function copyFilesTo($directory) 
+    /**
+     * Copy the template files to a given directory.
+     *
+     * @param string $directory
+     *   Direcoty to copy the files to.
+     */
+    protected function copyTemplateFilesTo(string $directory): void
     {
-        copy('./tests/template-metal.dpls', $directory . 'template-metal.dpls');
-        copy('./tests/template-uplifting-metal-songs.dpls', $directory . 'template-uplifting-metal-songs.dpls');
+        foreach (scandir('./tests/') as $entry) {
+            if (in_array($entry, ['.', '..'])) {
+                continue;
+            }
+
+            if (substr($entry, -5) != '.dpls') {
+                continue;
+            }
+
+            $name = str_replace('template-', '', $entry);
+
+            copy('./tests/' . $entry, $directory . $name);
+        }
+    }
+
+    /**
+     * Get a unique manager for a given function we want to test.
+     *
+     * @param string $functionName
+     *   The name of the test function.
+     *
+     * @return WishgranterProject\DescriptiveManager\PlaylistManager
+     *   Playlist manager.
+     */
+    protected function getManager(string $functionName)
+    {
+        $directory = $this->resetTest($functionName);
+        $manager = new PlaylistManager($directory);
+
+        return $manager;
     }
 }
