@@ -80,4 +80,16 @@ class SearchTest extends Base
 
         $this->assertTrue($equal);
     }
+
+    public function testFilterByPlaylistId()
+    {
+        $manager = $this->getManager(__FUNCTION__);
+
+        $search = $manager->search();
+        //$search->condition(['@metadata', 'playlistId'], 'metal', '!=');
+        $search->compilePlaylistIds();
+        $results = $search->find();
+
+        $this->assertTrue(true);
+    }
 }

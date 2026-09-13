@@ -2,10 +2,14 @@
 
 namespace WishgranterProject\DescriptiveManager\Search;
 
-use AdinanCenci\JsonLines\Search\Iterator\MetadataWrapper;
+use AdinanCenci\JsonLines\Search\Iterator\DataWrapper;
 use AdinanCenci\FileEditor\Search\Order\Order;
+use AdinanCenci\FileEditor\Search\Condition\AndConditionGroup;
+use AdinanCenci\FileEditor\Search\Condition\OrConditionGroup;
+use AdinanCenci\FileEditor\Search\Iterator\Metadata;
 use WishgranterProject\DescriptiveManager\PlaylistManager;
-use WishgranterProject\DescriptivePlaylist\Search as PlaylistSearch;
+use WishgranterProject\DescriptivePlaylist\Search\Search as PlaylistSearch;
+use WishgranterProject\DescriptivePlaylist\PlaylistItem;
 
 class Search
 {
@@ -46,21 +50,6 @@ class Search
         $this->manager = $manager;
         $this->mainGroup = new ConditionGroup($operator);
         $this->order = new Order();
-    }
-
-    /**
-     * Sets search's playlists pool.
-     *
-     * @param string|array $playlistIds
-     *   Playlist ids.
-     *
-     * @return WishgranterProject\DescriptiveManager\Search\Search
-     *   Returns itself.
-     */
-    public function playlists($playlistIds): Search
-    {
-        $this->playlistIds = (array) $playlistIds;
-        return $this;
     }
 
     /**
@@ -112,8 +101,48 @@ class Search
      */
     public function find(bool $removeDuplicated = true): array
     {
-        $results = $this->retrieveResults($removeDuplicated);
-        return $this->orderResults($results);
+        $results = $this->retrieveAndOrder($removeDuplicated);
+        array_walk($results, function (&$item) {
+            $item = new PlaylistItem($item->data);
+        });
+
+        return $results;
+    }
+
+    /**
+     * Compile a list of playlists to apply the search.
+     *
+     * Sometimes we want to constrain search to a narrow set of playlists,
+     * so it would be wasteful to iterate through playlists that we do not want.
+     *
+     * @todo There must be a better and more elegant way to accomplish this...
+     *
+     * @return string[]
+     *   List of playlists to apply the search.
+     */
+    public function compilePlaylistIds()
+    {
+        $playlistIds = array_keys($this->manager->getAllPlaylists());
+
+        $group = $this->mainGroup->operator == 'AND'
+            ? new AndConditionGroup()
+            : new OrConditionGroup();
+
+        $this->fromGroupToGroup($this->mainGroup, $group, [['@metadata', 'playlistId']]);
+
+        $filtered = [];
+
+        foreach ($playlistIds as $id) {
+            $wrapper = new DataWrapper('');
+            $metadata = new Metadata($wrapper, ['playlistId' => $id]);
+            $wrapper->setMetadata($metadata);
+
+            if ($group->evaluate($wrapper)) {
+                $filter[] = $id;
+            }
+        }
+
+        return $filtered;
     }
 
     /**
@@ -125,24 +154,29 @@ class Search
      * @return WishgranterProject\DescriptivePlaylist\PlaylistItem[]
      *   Playlist items.
      */
-    public function retrieveResults(bool $removeDuplicated = true): array
+    public function retrieveAndOrder(bool $removeDuplicated = true): array
     {
         $results = [];
+        $this->playlistIds = $this->compilePlaylistIds();
         foreach ($this->manager->getAllPlaylists() as $playlistId => $playlist) {
-            if ($this->playlistIds && !in_array($playlistId, $this->playlistIds)) {
+            if (in_array($playlistId, $this->playlistIds)) {
                 continue;
             }
 
             $search = $this->newSearchObject($playlist);
-            $finds = $search->find();
+            $finds = $search->retrieveAndOrder();
             foreach ($finds as $position => $find) {
                 $results[$playlistId . '-' . $position] = $find;
             }
         }
 
-        return $removeDuplicated
+        $results = $removeDuplicated
             ? $this->removeDuplicatedResults($results)
             : $results;
+
+        $this->order->order($results);
+
+        return $results;
     }
 
     /**
@@ -179,28 +213,6 @@ class Search
     }
 
     /**
-     * @param WishgranterProject\DescriptivePlaylist\PlaylistItem[] $searchResults
-     *   Playlist items.
-     *
-     * @return WishgranterProject\DescriptivePlaylist\PlaylistItem[]
-     *   The items ordered.
-     */
-    protected function orderResults($searchResults)
-    {
-        $ordered = [];
-        foreach ($searchResults as $playlistPosition => $item) {
-            $ordered[$playlistPosition] = new MetadataWrapper(0, $item);
-        }
-
-        $this->order->order($ordered);
-        array_walk($ordered, function (&$item) {
-            $item = $item->data;
-        });
-
-        return $ordered;
-    }
-
-    /**
      * Returns a playlist search object.
      *
      * @param WishgranterProject\DescriptivePlaylist\Playlist
@@ -213,6 +225,10 @@ class Search
     {
         $playlistSearch = $playlist->search($this->mainGroup->operator);
         $this->fromGroupToGroup($this->mainGroup, $playlistSearch);
+        $playlistSearch->setMetadataEagerGetter('playlistId', function ($iterator, $dataWrapper) {
+            return basename($iterator->filename, '.dpls');
+        });
+
         return $playlistSearch;
     }
 
@@ -223,10 +239,15 @@ class Search
      *   Manager group.
      * @param WishgranterProject\DescriptivePlaylist\Search $theirs
      *   Playlist search object.
+     * @param $filter array
+     *   Filter for properties.
      */
-    protected function fromGroupToGroup($ours, $theirs)
+    protected function fromGroupToGroup($ours, $theirs, $filter = [])
     {
         foreach ($ours->conditions as $con) {
+            if ($filter && !in_array($con['property'], $filter)) {
+                continue;
+            }
             $theirs->condition($con['property'], $con['valueToCompare'], $con['operatorId']);
         }
 
@@ -252,7 +273,7 @@ class Search
     {
         $uuids = [];
         foreach ($results as $playlistIdPos => $item) {
-            $uuid = $item->xxxOriginal ?? $item->uuid;
+            $uuid = $item?->data?->xxxOriginal ?? $item?->data?->uuid;
 
             if (! in_array($uuid, $uuids)) {
                 $uuids[] = $uuid;

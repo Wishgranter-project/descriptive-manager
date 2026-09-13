@@ -5,12 +5,6 @@ namespace WishgranterProject\DescriptiveManager\Search;
 class ConditionGroup
 {
     /**
-     * @var string
-     *   The logic operator: "AND" or "OR".
-     */
-    protected string $operator;
-
-    /**
      * @var array
      *   Array of conditions.
      */
@@ -28,9 +22,8 @@ class ConditionGroup
      * @param string $operator
      *   The logic operator: "AND" or "OR".
      */
-    public function __construct($operator = 'AND')
+    public function __construct(protected $operator = 'AND')
     {
-        $this->operator = $operator;
     }
 
     /**
