@@ -110,10 +110,11 @@ class Search
     }
 
     /**
-     * Compile a list of playlists to apply the search.
+     * Compiles a list of playlists to apply the search.
      *
-     * Sometimes we want to constrain search to a narrow set of playlists,
-     * so it would be wasteful to iterate through playlists that we do not want.
+     * Sometimes we want to constraint search to a narrow set of playlists,
+     * so it would be wasteful to iterate through playlists that we aimg to
+     * ignore.
      *
      * @todo There must be a better and more elegant way to accomplish this...
      *

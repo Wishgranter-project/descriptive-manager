@@ -16,7 +16,7 @@ class SearchTest extends Base
         $results = $search->find();
         $total = count($results);
 
-        $this->assertEquals(2, $total);
+        $this->assertEquals(4, $total);
     }
 
     public function testSearchAssociatedItems()
@@ -85,11 +85,17 @@ class SearchTest extends Base
     {
         $manager = $this->getManager(__FUNCTION__);
 
-        $search = $manager->search();
-        //$search->condition(['@metadata', 'playlistId'], 'metal', '!=');
-        $search->compilePlaylistIds();
-        $results = $search->find();
+        $allEmcompassing = $manager->search();
+        $allEmcompassing->condition('artist', 'Rhapsody of Fire');
 
-        $this->assertTrue(true);
+        $narrowSearch = $manager->search();
+        $narrowSearch->condition('artist', 'Rhapsody of Fire');
+        $narrowSearch->condition(['@metadata', 'playlistId'], 'playlist-b', '!=');
+
+        $allEmcompassingResults = $allEmcompassing->find();
+        $narrowResults = $narrowSearch->find();
+
+        $this->assertEquals(4, count($allEmcompassingResults));
+        $this->assertEquals(3, count($narrowResults));
     }
 }
